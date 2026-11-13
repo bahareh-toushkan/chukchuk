@@ -173,7 +173,7 @@ svg{display:block}
 .askb{background:#fff;border:.16rem solid var(--navy);border-radius:1rem;padding:.6rem 1rem;font-size:1.25rem;font-weight:800;text-align:center;min-width:11rem}
 .askb .chip{display:inline-grid;place-items:center;width:6rem;height:2.4rem;font-weight:900;clip-path:polygon(10% 0,90% 0,100% 100%,0 100%);margin:.2rem auto}
 .ring{height:.5rem;background:#dfe6f5;border-radius:.3rem;overflow:hidden;margin-top:.4rem}
-.ring i{display:block;height:100%;background:var(--warm);transform-origin:left center;animation:shrink 3s linear forwards}
+.ring i{display:block;height:100%;background:var(--warm);transform-origin:left center;animation:shrink 4.6s linear forwards}
 
 /* 5 해외 연결 */
 .s5{flex:1;position:relative;display:flex;min-height:0;gap:.8rem}
@@ -462,14 +462,14 @@ function play2(){
    upd();});}
  G.update=dt=>{spawnT-=dt;
   /* 물품 종류가 바뀔 때는 앞 물품이 다 지나간 뒤에 견본을 바꾸고 새 물품을 올린다 */
-  if(idx<plan.length&&spawnT<=0&&(idx===0||plan[idx].pi===plan[idx-1].pi||done>=idx)){spawn();spawnT=1.65;}
+  if(idx<plan.length&&spawnT<=0&&(idx===0||plan[idx].pi===plan[idx-1].pi||done>=idx)){spawn();spawnT=2.0;}
   const W=belt.clientWidth,tw=truck.clientWidth,end=W-tw*.7;
-  for(const it of items){if(it.state===2||it.state===3)continue;it.x+=dt/5.4;it.n.style.left=(it.x*end)+'px';
+  for(const it of items){if(it.state===2||it.state===3)continue;it.x+=dt/6.6;it.n.style.left=(it.x*end)+'px';
    if(it.x>=1){it.state=3;done++;it.n.remove();if(it.def){missed++;Snd.play('bad');truck.classList.remove('alert');void truck.offsetWidth;truck.classList.add('alert');popAt(truck,'불량 납품…','b');say('불량품이 그대로 납품됐어요. 견본과 잘 비교해 보세요.','bad');upd();}}}
   if(done>=plan.length){G.update=null;after(500,end2);}};
  G.hint=()=>{const it=items.find(i=>i.def&&!i.state&&i.x>.1&&i.x<.82);return it?it.n:null;};
  function end2(){const s=caught-wrong;finish(1,s>=total-1&&missed<=1?3:s>=Math.ceil(total/2)?2:1,'불량품 '+total+'개 중 '+caught+'개를 걸러 냈어요.');}
- say(ST[1].how);setTimer(52,end2);loop();}
+ say(ST[1].how);setTimer(64,end2);loop();}
 
 /* ---------- 3. 혁신제품 ---------- */
 const P3={ev:{ic:'evfire',nm:'전기차 화재 진압 장비'},cam:{ic:'camera',nm:'AI 교통 감시 장치'},drone:{ic:'drone',nm:'산불 감시 드론'},air:{ic:'air',nm:'교실 공기 관리 장치'}};
@@ -509,18 +509,18 @@ function play4(){const stock=[0,0,0,0,0,0];let delivered=0,asked=0,cur=-1,phase=
   const it={n,dead:false};live.push(it);
   const kill=()=>{if(it.dead)return;it.dead=true;n.classList.add('gone');setTimeout(()=>n.remove(),260);};
   tap(n,()=>{if(it.dead)return;if(stock[i]<3){stock[i]++;pips();Snd.play('pick');popAt(n,'+1','g');flash(ware.children[i],'hit');}else{popAt(n,'가득 찼어요','b');}kill();});
-  after(1700,kill);}
- G.update=dt=>{if(phase!==0)return;spT-=dt;if(spT<=0){spawn();spT=.5;}};
+  after(2700,kill);}
+ G.update=dt=>{if(phase!==0)return;spT-=dt;if(spT<=0){spawn();spT=.65;}};
  G.hint=()=>{if(phase===0){const it=live.find(x=>!x.dead);return it?it.n:null;}if(phase===1&&cur>=0&&stock[cur]>0)return ware.children[cur];return null;};
  function crisis(){phase=1;live.forEach(x=>{x.dead=true;x.n.remove();});ph.textContent='공급망 위기! · 공장이 찾는 금속을 창고에서 눌러 내보내세요';ph.classList.add('crisis');Snd.play('alarm');
-  say('위기가 왔어요. 공장이 찾는 금속을 창고에서 눌러 주세요.','bad');reqs=shuffle([0,1,2,3,4,5]).concat(shuffle([0,1,2,3,4,5]).slice(0,2));
-  setTimer(26,end);after(900,ask);}
+  say('위기가 왔어요. 공장이 찾는 금속을 창고에서 눌러 주세요.','bad');reqs=shuffle([0,1,2,3,4,5]);
+  setTimer(33,end);after(900,ask);}
  let reqs=[],askId=0;
  function ask(){if(phase!==1)return;if(asked>=reqs.length)return end();cur=reqs[asked++];const m=M4[cur],my=++askId;
   fld.innerHTML='<div class="ask">'+ic('factory')+'<div class="askb">공장이 멈출 것 같아요!<div class="chip" style="background:'+m.c+'">'+m.nm+'</div>'+jo(m.nm,'이','가').slice(m.nm.length)+' 필요해요<div class="ring"><i></i></div></div></div>';
-  after(3000,()=>{if(askId===my&&cur>=0){cur=-1;Snd.play('bad');say(stock[reqs[asked-1]]>0?'늦었어요. 공장이 잠시 멈췄어요.':m.nm+' 재고가 없어서 도울 수 없었어요.','bad');after(500,ask);}});}
- function end(){if(phase===2)return;phase=2;finish(3,delivered>=6?3:delivered>=3?2:1,'위기 때 공장에 금속을 '+delivered+'번 보냈어요.');}
- say('금속이 보이면 눌러서 창고에 모아 두세요.');setTimer(13,crisis);loop();}
+  after(4600,()=>{if(askId===my&&cur>=0){cur=-1;Snd.play('bad');say(stock[reqs[asked-1]]>0?'늦었어요. 공장이 잠시 멈췄어요.':m.nm+' 재고가 없어서 도울 수 없었어요.','bad');after(500,ask);}});}
+ function end(){if(phase===2)return;phase=2;finish(3,delivered>=5?3:delivered>=3?2:1,'위기 때 공장에 금속을 '+delivered+'번 보냈어요.');}
+ say('금속이 보이면 눌러서 창고에 모아 두세요.');setTimer(15,crisis);loop();}
 
 /* ---------- 5. 해외 진출 ---------- */
 const R5=[[{ic:'water',nm:'정수 장치',need:'깨끗한 물이 필요해요'},{ic:'medical',nm:'의료 장비',need:'병원 장비를 찾고 있어요'},{ic:'led',nm:'LED 가로등',need:'밤길을 밝히고 싶어요'}],
